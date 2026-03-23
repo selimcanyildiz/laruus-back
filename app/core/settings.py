@@ -11,6 +11,12 @@ class Config:
         os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60)
     )
 
+    # AWS S3
+    AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID", "")
+    AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+    AWS_REGION: str = os.getenv("AWS_REGION", "eu-central-1")
+    AWS_S3_BUCKET: str = os.getenv("AWS_S3_BUCKET", "")
+
     def validate(self):
         if not self.DATABASE_URL:
             raise RuntimeError("DATABASE_URL is not set")

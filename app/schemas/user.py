@@ -29,7 +29,7 @@ class UserOut(BaseModel):
     last_name: str
     email: str
     phone: Optional[str]
+    is_admin: bool = False
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}

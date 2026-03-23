@@ -30,6 +30,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 
     profile_created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
