@@ -83,6 +83,17 @@ def list_products(
     return ProductList(items=items, total=total, page=page, page_size=page_size)
 
 
+@router.get("/by-slug/{slug}", response_model=ProductOut)
+def get_product_by_slug(
+    slug: str,
+    db: Session = Depends(get_db),
+):
+    product = db.query(Product).filter(Product.slug == slug, Product.is_active == True).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+
 @router.get("/{product_id}", response_model=ProductOut)
 def get_product(
     product_id: UUID,
