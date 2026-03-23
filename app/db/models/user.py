@@ -31,6 +31,8 @@ class User(Base):
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    verification_code: Mapped[Optional[str]] = mapped_column(String(6))
 
     profile_created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
