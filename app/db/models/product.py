@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional
-from sqlalchemy import String, Text, Float, Integer, DateTime, ForeignKey, func
+from sqlalchemy import String, Text, Integer, DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from app.db.base import Base
@@ -44,7 +44,7 @@ class Product(Base):
     category = relationship("Category", back_populates="products")
 
     brand: Mapped[Optional[str]] = mapped_column(String(100))
-    price: Mapped[float] = mapped_column(Float, default=0)
+    credits: Mapped[int] = mapped_column(Integer, default=0)
     style: Mapped[Optional[str]] = mapped_column(String(50))
     materials: Mapped[Optional[list]] = mapped_column(ARRAY(String), default=[])
 

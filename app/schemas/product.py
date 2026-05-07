@@ -37,7 +37,7 @@ class ProductCreate(BaseModel):
     type: str  # models, scenes, textures
     category_id: UUID
     brand: Optional[str] = None
-    price: float = 0
+    credits: int = 0
     style: Optional[str] = None
     materials: list[str] = []
     is_free: bool = False
@@ -48,7 +48,7 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     category_id: Optional[UUID] = None
     brand: Optional[str] = None
-    price: Optional[float] = None
+    credits: Optional[int] = None
     style: Optional[str] = None
     materials: Optional[list[str]] = None
     is_free: Optional[bool] = None
@@ -63,7 +63,7 @@ class ProductOut(BaseModel):
     type: str
     category_id: UUID
     brand: Optional[str] = None
-    price: float
+    credits: int
     style: Optional[str] = None
     materials: list[str] = []
     images: list[str] = []

@@ -70,10 +70,10 @@ def list_products(
     # Sıralama
     if sort == "newest":
         query = query.order_by(Product.created_at.desc())
-    elif sort == "price_asc":
-        query = query.order_by(Product.price.asc())
-    elif sort == "price_desc":
-        query = query.order_by(Product.price.desc())
+    elif sort == "credits_asc":
+        query = query.order_by(Product.credits.asc())
+    elif sort == "credits_desc":
+        query = query.order_by(Product.credits.desc())
     elif sort == "popular":
         query = query.order_by(Product.download_count.desc())
 
