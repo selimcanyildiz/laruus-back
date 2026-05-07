@@ -6,6 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
+from app.core.settings import config
+
 # ==================================================
 # PASSWORD HASHING (ARGON2)
 # ==================================================
@@ -25,9 +27,9 @@ def verify_password(password: str, hashed_password: str) -> bool:
 # JWT CONFIG
 # ==================================================
 
-SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_ME"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+SECRET_KEY = config.SECRET_KEY
+ALGORITHM = config.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = config.ACCESS_TOKEN_EXPIRE_MINUTES
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/auth/login"
