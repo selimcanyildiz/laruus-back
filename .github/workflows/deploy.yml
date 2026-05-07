@@ -1,0 +1,33 @@
+name: Deploy backend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-back
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd /opt/laruus-back
+            sudo -u laruus git fetch --all
+            sudo -u laruus git reset --hard origin/main
+            sudo -u laruus /opt/laruus-back/venv/bin/pip install -r requirements.txt --quiet
+            systemctl restart laruus-back.service
+            sleep 2
+            systemctl is-active laruus-back.service
+            curl -fsS -o /dev/null http://127.0.0.1:8000/api/v1/products/categories
+            echo "Backend deployed: $(git rev-parse --short HEAD)"
