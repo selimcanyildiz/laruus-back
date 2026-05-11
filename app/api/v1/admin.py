@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -11,6 +13,8 @@ from app.schemas.product import (
     CategoryCreate, CategoryOut, CategoryWithChildren,
 )
 from app.services.s3_service import upload_file, delete_file
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -114,22 +118,22 @@ def delete_product(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # S3'ten dosyaları sil
+    # S3'ten dosyaları sil — silme başarısız olursa log, ama DB delete'i bloklamasın
     for img_url in (product.images or []):
         key = img_url.split(".amazonaws.com/")[-1] if ".amazonaws.com/" in img_url else None
         if key:
             try:
                 delete_file(key)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("S3 image delete failed (key=%s): %s", key, e)
 
     if product.model_file_url:
         key = product.model_file_url.split(".amazonaws.com/")[-1] if ".amazonaws.com/" in product.model_file_url else None
         if key:
             try:
                 delete_file(key)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("S3 model file delete failed (key=%s): %s", key, e)
 
     db.delete(product)
     db.commit()

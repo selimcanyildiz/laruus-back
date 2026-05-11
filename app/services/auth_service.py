@@ -50,7 +50,11 @@ def register_user(db: Session, data: UserCreate) -> dict:
 
 
 def verify_user(db: Session, email: str, code: str) -> str:
-    user = db.query(User).filter(User.email == email).first()
+    user = (
+        db.query(User)
+        .filter(User.email == email, User.deleted_at.is_(None))
+        .first()
+    )
 
     if not user:
         raise HTTPException(
@@ -78,7 +82,11 @@ def verify_user(db: Session, email: str, code: str) -> str:
 
 
 def login_user(db: Session, data: UserLogin) -> str:
-    user = db.query(User).filter(User.email == data.email).first()
+    user = (
+        db.query(User)
+        .filter(User.email == data.email, User.deleted_at.is_(None))
+        .first()
+    )
 
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(
