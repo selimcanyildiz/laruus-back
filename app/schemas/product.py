@@ -56,6 +56,8 @@ class ProductUpdate(BaseModel):
 
 
 class ProductOut(BaseModel):
+    """Halka açık ürün görünümü. `model_file_url` burada YOK — sadece
+    /download endpoint'i, krediyi düştükten sonra döner."""
     id: UUID
     title: str
     slug: str
@@ -67,8 +69,6 @@ class ProductOut(BaseModel):
     style: Optional[str] = None
     materials: list[str] = []
     images: list[str] = []
-    model_file_url: Optional[str] = None
-    model_file_size: Optional[int] = None
     is_free: bool
     is_active: bool
     download_count: int
@@ -78,8 +78,23 @@ class ProductOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ProductAdminOut(ProductOut):
+    """Admin görünümü — model dosyası URL/boyut bilgisini de içerir."""
+    model_file_url: Optional[str] = None
+    model_file_size: Optional[int] = None
+
+
 class ProductList(BaseModel):
     items: list[ProductOut]
     total: int
     page: int
     page_size: int
+
+
+class DownloadOut(BaseModel):
+    """Başarılı download yanıtı — download_url krediyle ödenmiş indirme linki."""
+    download_url: Optional[str] = None
+    credits_charged: int
+    daily_limit: int
+    used_today: int
+    remaining_today: int

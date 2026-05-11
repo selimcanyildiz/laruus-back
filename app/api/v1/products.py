@@ -3,9 +3,15 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from uuid import UUID
 
-from app.api.deps import get_db
+from app.api.deps import get_db, get_current_user
 from app.db.models.product import Product, Category
-from app.schemas.product import ProductOut, ProductList, CategoryOut, CategoryWithChildren
+from app.db.models.user import User
+from app.schemas.product import (
+    ProductOut, ProductList, CategoryOut, CategoryWithChildren, DownloadOut,
+)
+from app.services.credit_service import (
+    consume_credits, get_today_usage, get_daily_limit,
+)
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -103,3 +109,37 @@ def get_product(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
+
+
+@router.post("/{product_id}/download", response_model=DownloadOut)
+def download_product(
+    product_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    product = (
+        db.query(Product)
+        .filter(Product.id == product_id, Product.is_active == True)
+        .first()
+    )
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    if not product.model_file_url:
+        raise HTTPException(status_code=400, detail="No file available for this product")
+
+    charge = 0 if product.is_free else product.credits
+    if charge > 0:
+        consume_credits(db, current_user.id, charge)
+
+    product.download_count += 1
+    db.commit()
+
+    limit = get_daily_limit(db)
+    used = get_today_usage(db, current_user.id)
+    return DownloadOut(
+        download_url=product.model_file_url,
+        credits_charged=charge,
+        daily_limit=limit,
+        used_today=used,
+        remaining_today=limit - used,
+    )

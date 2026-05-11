@@ -9,7 +9,7 @@ from app.api.deps import get_db, get_admin_user
 from app.db.models.user import User
 from app.db.models.product import Product, Category
 from app.schemas.product import (
-    ProductCreate, ProductUpdate, ProductOut,
+    ProductCreate, ProductUpdate, ProductAdminOut,
     CategoryCreate, CategoryOut, CategoryWithChildren,
 )
 from app.services.s3_service import upload_file, delete_file
@@ -62,7 +62,7 @@ def delete_category(
 
 # ============ PRODUCTS ============
 
-@router.get("/products", response_model=list[ProductOut])
+@router.get("/products", response_model=list[ProductAdminOut])
 def list_products(
     type: Optional[str] = None,
     page: int = 1,
@@ -76,7 +76,7 @@ def list_products(
     return query.order_by(Product.created_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
 
 
-@router.post("/products", response_model=ProductOut)
+@router.post("/products", response_model=ProductAdminOut)
 def create_product(
     data: ProductCreate,
     db: Session = Depends(get_db),
@@ -89,7 +89,7 @@ def create_product(
     return product
 
 
-@router.put("/products/{product_id}", response_model=ProductOut)
+@router.put("/products/{product_id}", response_model=ProductAdminOut)
 def update_product(
     product_id: UUID,
     data: ProductUpdate,
